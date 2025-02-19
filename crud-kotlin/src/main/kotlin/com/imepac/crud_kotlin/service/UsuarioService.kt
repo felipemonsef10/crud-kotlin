@@ -1,18 +1,18 @@
 package com.imepac.crud_kotlin.service
 
 import com.imepac.crud_kotlin.entity.Usuario
+import com.imepac.crud_kotlin.entity.Pedido
 import com.imepac.crud_kotlin.repository.UsuarioRepository
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.PathVariable
 
 @Service
 class UsuarioService (private val usuarioRepository: UsuarioRepository) {
     fun listar(): List<Usuario> = usuarioRepository.findAll()
 
-    fun buscar(@PathVariable id: Long): Usuario? = usuarioRepository.findById(id).orElse(null)
+    fun buscar(id: Long): Usuario? = usuarioRepository.findById(id).orElse(null)
 
     fun criarUsuario(usuario: Usuario): Usuario {
-        usuario.calcularValorTotal() //Calcula o valor total antes de salvar
+        usuario.calcularValorTotal()
         return usuarioRepository.save(usuario)
     }
 
@@ -20,10 +20,26 @@ class UsuarioService (private val usuarioRepository: UsuarioRepository) {
         val usuarioExistente = usuarioRepository.findById(id).orElse(null) ?: return null
         val usuarioAtualizado = usuarioExistente.copy(
             nome = usuario.nome,
-            email = usuario.email, valorCompra = usuario.valorCompra,
+            email = usuario.email,
+            valorCompra = usuario.valorCompra,
             valorDesconto = usuario.valorDesconto
         )
-        usuarioAtualizado.calcularValorTotal() // Recalcula o valor total
+        usuarioAtualizado.calcularValorTotal()
         return usuarioRepository.save(usuarioAtualizado)
+    }
+
+    fun deletarUsuario(id: Long): Boolean {
+        return if (usuarioRepository.existsById(id)) {
+            usuarioRepository.deleteById(id)
+            true
+        } else {
+            false
+        }
+    }
+
+    // 🚀 Novo método: Retorna os pedidos de um usuário específico
+    fun listarPedidosPorUsuario(id: Long): List<Pedido> {
+        val usuario = usuarioRepository.findWithPedidosById(id)
+        return usuario?.pedidos ?: emptyList()
     }
 }
