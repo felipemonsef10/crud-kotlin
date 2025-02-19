@@ -7,9 +7,13 @@ data class Pedido(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     val descricao: String,
-    val valorTotal: Double,
+    var valorTotal: Double,
 
-    @ManyToOne(fetch = FetchType.LAZY)  // Muitos pedidos para um usuário
-    @JoinColumn(name = "usuario_id")  // Define a coluna de chave estrangeira no banco
-    val usuario: Usuario
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    val usuario: Usuario,
+
+    @ManyToOne
+    @JoinColumn(name = "servico_id") // 🔥 Cada pedido tem um serviço associado
+    val servico: Servico
 )
